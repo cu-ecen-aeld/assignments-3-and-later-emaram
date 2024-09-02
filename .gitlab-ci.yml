@@ -2,7 +2,8 @@ image: "cuaesd/aesd-dind"
 
 # See https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#tls-enabled
 services:
-    - docker:19.03.12-dind
+    - docker:26.1.4
+    #- docker:19.03.12-dind
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -10,7 +11,7 @@ variables:
     # create them automatically on boot, and will create
     # `/certs/client` that will be shared between the service and job
     # container, thanks to volume mount from config.toml
-    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_TLS_CERTDIR: "~/certs"
 
 test:
     stage: test
