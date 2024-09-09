@@ -22,7 +22,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    const char* command = argv[0];
     const char* filename = argv[1];
     const char* text = argv[2];
 
