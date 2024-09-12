@@ -115,8 +115,8 @@ bool do_exec(int count, ...)
             int child_exit_status = WEXITSTATUS(waiting_status);
             printf("Child process exited with status %d", child_exit_status);
 
-            if (child_exit_status != 0)
-                return false;
+            //if (child_exit_status != 0)
+            //    return false;
         }
 
     }
