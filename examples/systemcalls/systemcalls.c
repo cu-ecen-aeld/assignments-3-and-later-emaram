@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <fcntl.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -102,7 +103,7 @@ bool do_exec(int count, ...)
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
-            int child_exit_status = EXITSTATUS(waiting_status);
+            int child_exit_status = WEXITSTATUS(waiting_status);
             printf("Child process exited with status %d", child_exit_status);
 
             if (child_exit_status != 0)
@@ -187,7 +188,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
-            int child_exit_status = EXITSTATUS(waiting_status);
+            int child_exit_status = WEXITSTATUS(waiting_status);
             printf("Child process exited with status %d", child_exit_status);
 
             if (child_exit_status != 0)
