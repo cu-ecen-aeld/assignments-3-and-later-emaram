@@ -1,4 +1,6 @@
 #include "systemcalls.h"
+#include <sys/wait.h>
+#include <unistd.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -17,6 +19,19 @@ bool do_system(const char *cmd)
  *   or false() if it returned a failure
 */
 
+    /* Check, first, if cmd is not NULL */
+    if (cmd == NULL) {
+        printf("ERROR: cmd is NULL");
+        return false;
+    }
+
+    int ret_code = system(cmd);
+    if (ret_code == -1) {
+        perror("system() failed!");
+        return false;
+    }
+
+    /* If we reached this point, everything is fine :-) */
     return true;
 }
 
@@ -47,7 +62,7 @@ bool do_exec(int count, ...)
     command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+    // command[count] = command[count];
 
 /*
  * TODO:
@@ -58,6 +73,42 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+
+    /* Fork new child */
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork() failed!");
+        return false;
+    }
+
+    if (pid == 0) {
+        /* We are in child process. Let's execute the command */
+        execv(command[0], command);
+
+        /* Since execv is blocker ... we should not reach this point*/
+        printf("Seems that execv() failed.");
+        return false;
+    }
+    else {
+        /* We are in parent process. Waiting for child to complete. */
+        int waiting_status = 0;
+        pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
+        if (waiting_pid == -1) {
+            perror("waitpid() failed!");
+            return false;
+        }
+
+        /* If existed, check exit status */
+        if (WIFEXITED(waiting_status)) {
+            int child_exit_status = EXITSTATUS(waiting_status);
+            printf("Child process exited with status %d", child_exit_status);
+
+            if (child_exit_status != 0)
+                return false;
+        }
+
+    }
+
 
     va_end(args);
 
@@ -82,7 +133,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     command[count] = NULL;
     // this line is to avoid a compile warning before your implementation is complete
     // and may be removed
-    command[count] = command[count];
+    // command[count] = command[count];
 
 
 /*
@@ -92,6 +143,57 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+
+    /* Create outputfile */
+    int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (fd == -1) {
+        perror("Cannot create or open %s", outputfile);
+        return false;
+    }
+
+    /* Redirect stdout to fd */
+    int redirect_status = dup2(fd, 1);
+    if (redirect_status < 0) {
+        perror("dup2() failed!");
+        return false;
+    }
+    close(fd);
+
+    /* Fork new child */
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork() failed!");
+        return false;
+    }
+
+    if (pid == 0) {
+        /* We are in child process. Let's execute the command */
+        execv(command[0], command);
+
+        /* Since execv is blocker ... we should not reach this point*/
+        printf("Seems that execv() failed.");
+        return false;
+    }
+    else {
+        /* We are in parent process. Waiting for child to complete. */
+        int waiting_status = 0;
+        pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
+        if (waiting_pid == -1) {
+            perror("waitpid() failed!");
+            return false;
+        }
+
+        /* If existed, check exit status */
+        if (WIFEXITED(waiting_status)) {
+            int child_exit_status = EXITSTATUS(waiting_status);
+            printf("Child process exited with status %d", child_exit_status);
+
+            if (child_exit_status != 0)
+                return false;
+        }
+
+    }
+
 
     va_end(args);
 
