@@ -76,6 +76,7 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+    fflush(stdout);
 
     /* Fork new child */
     pid_t pid = fork();
@@ -161,6 +162,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         return false;
     }
     close(fd);
+
+    fflush(stdout);
 
     /* Fork new child */
     pid_t pid = fork();
