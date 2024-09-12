@@ -92,7 +92,11 @@ bool do_exec(int count, ...)
         /* We are in child process. Let's execute the command */
         if (execv(command[0], command) == -1) {
             /* Since execv is blocker ... we should not reach this point*/
-            printf("Seems that execv(%s, %s) failed.", command[0], command[1]);
+            printf("Seems that execv(%s, %s) failed.\n", command[0], command[1]);
+            for (int i = 0; i < count; i++ ) {
+                // Debugging part, to be removed
+                printf("Command[%d] is [%s]\n", i+1, command[i]);
+            }
             return false;
         }
     }
