@@ -76,6 +76,9 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
+
+    va_end(args);
+    
     fflush(stdout);
 
     /* Fork new child */
@@ -87,11 +90,11 @@ bool do_exec(int count, ...)
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
-        execv(command[0], command);
-
-        /* Since execv is blocker ... we should not reach this point*/
-        printf("Seems that execv() failed.");
-        return false;
+        if (execv(command[0], command) == -1) {
+            /* Since execv is blocker ... we should not reach this point*/
+            printf("Seems that execv(%s, %s) failed.", command[0], command[1]);
+            return false;
+        }
     }
     else {
         /* We are in parent process. Waiting for child to complete. */
@@ -114,7 +117,6 @@ bool do_exec(int count, ...)
     }
 
 
-    va_end(args);
 
     return true;
 }
@@ -148,6 +150,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
+    va_end(args);
+
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     if (fd == -1) {
@@ -174,11 +178,11 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
-        execv(command[0], command);
-
-        /* Since execv is blocker ... we should not reach this point*/
-        printf("Seems that execv() failed.");
-        return false;
+        if (execv(command[0], command) == -1) {
+            /* Since execv is blocker ... we should not reach this point*/
+            printf("Seems that execv(%s, %s) failed.", command[0], command[1]);
+            return false;
+        }
     }
     else {
         /* We are in parent process. Waiting for child to complete. */
@@ -199,9 +203,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         }
 
     }
-
-
-    va_end(args);
 
     return true;
 }
