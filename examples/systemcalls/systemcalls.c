@@ -1,6 +1,8 @@
 #include "systemcalls.h"
 #include <sys/wait.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -147,7 +149,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
     if (fd == -1) {
-        perror("Cannot create or open %s", outputfile);
+        printf("Cannot create or open %s", outputfile);
         return false;
     }
 
