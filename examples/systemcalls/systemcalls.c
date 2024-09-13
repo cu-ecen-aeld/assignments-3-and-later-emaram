@@ -43,7 +43,7 @@ bool do_system(const char *cmd)
 void prt(char* function_name, int count, char** command, char* message)
 {
     printf("%s(%d", function_name, count);
-    for (i = 0; i < count; i++)
+    for (int i = 0; i < count; i++)
         printf(", \"%s\"", command[i]);
     printf(") : %s\n", message);
     fflush(stdout);
