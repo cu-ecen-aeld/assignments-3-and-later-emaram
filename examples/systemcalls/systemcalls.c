@@ -78,6 +78,11 @@ bool do_exec(int count, ...)
 */
 
     va_end(args);
+
+    printf("Start do_exec(%d", count);
+    for (i = 0; i < count; i++)
+        printf(", \"%s\"", command[i]);
+    printf(")...\n");
     
     fflush(stdout);
 
@@ -110,9 +115,9 @@ bool do_exec(int count, ...)
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
-            printf("Child process exited with status %d", child_exit_status);
+            printf("Child process exited with status %d ... \n", child_exit_status);
 
-            if (child_exit_status != 0)
+            if (child_exit_status != EXIT_SUCCESS)
                 return false;
         }
 
@@ -168,6 +173,13 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         return false;
     }
     close(fd);
+
+
+    printf("Start do_exec_redirect(\"%s\", %d", outputfile, count);
+    for (i = 0; i < count; i++)
+        printf(", \"%s\"", command[i]);
+    printf(")...\n");
+
 
     fflush(stdout);
 
