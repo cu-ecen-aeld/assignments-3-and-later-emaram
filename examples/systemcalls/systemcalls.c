@@ -28,6 +28,8 @@ bool do_system(const char *cmd)
         return false;
     }
 
+    printf("Start do_system(\"%s\")...\n", cmd);
+
     int ret_code = system(cmd);
     if (ret_code == -1) {
         perror("system() failed!");
@@ -95,6 +97,7 @@ bool do_exec(int count, ...)
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
+        printf("In child process. Executing execv()...\n");
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
@@ -104,7 +107,7 @@ bool do_exec(int count, ...)
         return false;
     }
     else {
-        printf("Waiting for pid %d...\n", pid);
+        printf("In parent process. Waiting for pid %d...\n", pid);
         /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
