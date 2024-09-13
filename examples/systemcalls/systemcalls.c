@@ -24,7 +24,7 @@ bool do_system(const char *cmd)
 
     /* Check, first, if cmd is not NULL */
     if (cmd == NULL) {
-        printf("ERROR: cmd is NULL");
+        printf("ERROR: cmd is NULL\n");
         return false;
     }
 
@@ -32,7 +32,7 @@ bool do_system(const char *cmd)
 
     int ret_code = system(cmd);
     if (ret_code == -1) {
-        perror("system() failed!");
+        printf("system() command failed!\n");
         return false;
     }
 
@@ -95,6 +95,8 @@ bool do_exec(int count, ...)
         return false;
     }
 
+    fflush(stdout);
+
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
         printf("In child process. Executing execv()...\n");
@@ -130,6 +132,7 @@ bool do_exec(int count, ...)
     }
 
     printf("Returning true ....\n");
+    fflush(stdout);
 
 
     return true;
