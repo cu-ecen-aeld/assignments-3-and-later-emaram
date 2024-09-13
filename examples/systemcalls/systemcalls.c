@@ -91,7 +91,7 @@ bool do_exec(int count, ...)
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
-        perror("fork() failed!");
+        printf("fork() failed!\n");
         return false;
     }
 
