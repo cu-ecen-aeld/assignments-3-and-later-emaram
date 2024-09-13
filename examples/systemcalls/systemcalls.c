@@ -128,6 +128,11 @@ bool do_exec(int count, ...)
                 return false;
             }
         }
+        else {
+            printf("do_exec(): The child seems to be killed, stopped or unexpected ... returning false\n");
+            fflush(stdout);
+            return false;
+        }
 
     }
 
