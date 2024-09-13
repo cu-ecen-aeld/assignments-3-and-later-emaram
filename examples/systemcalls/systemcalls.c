@@ -80,11 +80,6 @@ bool do_exec(int count, ...)
 */
 
     va_end(args);
-
-    printf("Start do_exec(%d", count);
-    for (i = 0; i < count; i++)
-        printf(", \"%s\"", command[i]);
-    printf(")...\n");
     
     fflush(stdout);
 
@@ -97,7 +92,6 @@ bool do_exec(int count, ...)
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
-        printf("In child process. Executing execv()...\n");
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
@@ -108,7 +102,6 @@ bool do_exec(int count, ...)
         return false;
     }
     else {
-        printf("In parent process. Waiting for pid %d...\n", pid);
         /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
@@ -169,66 +162,79 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
     va_end(args);
 
-    fflush(stdout);
-
-    /* Create outputfile */
-    int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
-    if (fd == -1) {
-        printf("Cannot create or open %s", outputfile);
-        return false;
-    }
-
-    /* Redirect stdout to fd */
-    int redirect_status = dup2(fd, 1);
-    if (redirect_status < 0) {
-        perror("dup2() failed!");
-        return false;
-    }
-    close(fd);
-
-
     printf("Start do_exec_redirect(\"%s\", %d", outputfile, count);
     for (i = 0; i < count; i++)
         printf(", \"%s\"", command[i]);
     printf(")...\n");
 
+    fflush(stdout);
+
+    printf("Creating %s ...\n", outputfile);
+    /* Create outputfile */
+    int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    if (fd == -1) {
+        printf("Cannot create or open %s. Returning false ...\n", outputfile);
+        return false;
+    }
+
+    printf("Redirecting stdout to fd[%d] ...\n", fd);
+    /* Redirect stdout to fd */
+    int redirect_status = dup2(fd, 1);
+    if (redirect_status < 0) {
+        printf("dup2() failed! Returning false ....\n");
+        return false;
+    }
+    close(fd);
+
 
     fflush(stdout);
+
+
 
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
-        perror("fork() failed!");
+        printf("fork() failed! Returning false ...\n");
         return false;
     }
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
-        if (execv(command[0], command) == -1) {
-            /* Since execv is blocker ... we should not reach this point*/
-            printf("Seems that execv(%s, %s) failed.", command[0], command[1]);
-            return false;
-        }
+        execv(command[0], command);
+
+        /* Since execv is blocker ... we should not reach this point*/
+        printf("Seems that execv(...) failed.\n");
+        printf("Most probably there is not the full path of the command or an unknown command.\n");
+        printf(" Returning false ...\n");
+        /* Parent process return false */
+        return false;
     }
     else {
-        /* We are in parent process. Waiting for child to complete. */
+        /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
-            perror("waitpid() failed!");
+            printf("waitpid() failed! Returning false ...\n");
             return false;
         }
+
+        printf("waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
-            printf("Child process exited with status %d", child_exit_status);
+            printf("Child process exited with status %d ... \n", child_exit_status);
 
-            if (child_exit_status != 0)
+            if (child_exit_status != EXIT_SUCCESS) {
+                printf(" Returning false ...\n");
                 return false;
+            }
         }
 
     }
 
+    printf("Returning true ....\n");
+    fflush(stdout);
     return true;
+
 }
