@@ -133,8 +133,7 @@ bool do_exec(int count, ...)
 
     printf("Returning true ....\n");
     fflush(stdout);
-
-
+    return true;
     return true;
 }
 
