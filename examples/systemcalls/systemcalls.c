@@ -86,7 +86,7 @@ bool do_exec(int count, ...)
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
-        printf("fork() failed! Returning false ...\n");
+        printf("do_exec(): fork() failed! Returning false ...\n");
         return false;
     }
 
@@ -102,16 +102,16 @@ bool do_exec(int count, ...)
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
-            printf("waitpid() failed! Returning false ...\n");
+            printf("do_exec(): waitpid() failed! Returning false ...\n");
             return false;
         }
 
-        printf("waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
+        printf("do_exec(): waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
-            printf("Child process exited with status %d ... \n", child_exit_status);
+            printf("do_exec(): Child process exited with status %d ... \n", child_exit_status);
 
             if (child_exit_status != EXIT_SUCCESS) {
                 return false;
@@ -120,7 +120,7 @@ bool do_exec(int count, ...)
 
     }
 
-    printf("Returning true ....\n");
+    printf("do_exec(): Returning true ....\n");
     fflush(stdout);
     return true;
 
@@ -157,7 +157,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
     va_end(args);
 
-    printf("Start do_exec_redirect(\"%s\", %d", outputfile, count);
+    printf("*** Start do_exec_redirect(\"%s\", %d", outputfile, count);
     for (i = 0; i < count; i++)
         printf(", \"%s\"", command[i]);
     printf(")...\n");
@@ -166,7 +166,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, 0644);
     if (fd == -1) {
-        printf("Cannot create or open %s. Returning false ...\n", outputfile);
+        printf("*** Cannot create or open %s. Returning false ...\n", outputfile);
         return false;
     }
 
@@ -176,20 +176,20 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
-        printf("fork() failed! Returning false ...\n");
+        printf("*** fork() failed! Returning false ...\n");
         return false;
     }
 
     if (pid == 0) {
         /* We are in child process. */
 
-        printf("In child processs - Redirecting stdout to fd[%d] ...\n", fd);
+        printf("*** In child processs - Redirecting stdout to fd[%d] ...\n", fd);
         fflush(stdout);
         /* Redirect stdout to fd */
         int redirect_status = dup2(fd, 1);
         close(fd);
         if (redirect_status < 0) {
-            printf("dup2() failed! Returning false ....\n");
+            printf("*** dup2() failed! Returning false ....\n");
             return false;
         }
         execv(command[0], command);
@@ -202,25 +202,26 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
-            printf("waitpid() failed! Returning false ...\n");
+            printf("*** waitpid() failed! Returning false ...\n");
             return false;
         }
 
-        printf("waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
+        printf("*** waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
-            printf("Child process exited with status %d ... \n", child_exit_status);
+            printf("*** Child process exited with status %d ... \n", child_exit_status);
 
             if (child_exit_status != EXIT_SUCCESS) {
-                printf(" Returning false ...\n");
+                printf("***  Returning false ...\n");
                 return false;
             }
         }
 
     }
 
+    printf("*** Returning true ....\n");
     fflush(stdout);
     return true;
 
