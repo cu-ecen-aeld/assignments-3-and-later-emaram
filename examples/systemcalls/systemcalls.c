@@ -95,10 +95,6 @@ bool do_exec(int count, ...)
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
-        printf("Seems that execv(...) failed.\n");
-        printf("Most probably there is not the full path of the command or an unknown command.\n");
-        printf(" Returning false ...\n");
-        /* Parent process return false */
         return false;
     }
     else {
@@ -118,7 +114,6 @@ bool do_exec(int count, ...)
             printf("Child process exited with status %d ... \n", child_exit_status);
 
             if (child_exit_status != EXIT_SUCCESS) {
-                printf(" Returning false ...\n");
                 return false;
             }
         }
@@ -168,7 +163,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     printf(")...\n");
 
 
-    printf("Creating %s ...\n", outputfile);
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, 0644);
     if (fd == -1) {
@@ -176,11 +170,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         return false;
     }
 
-    
-
-
     fflush(stdout);
-
 
 
     /* Fork new child */
@@ -202,8 +192,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
             printf("dup2() failed! Returning false ....\n");
             return false;
         }
-
-        fflush(stdout);
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
@@ -233,7 +221,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
     }
 
-    printf("Returning true ....\n");
     fflush(stdout);
     return true;
 
