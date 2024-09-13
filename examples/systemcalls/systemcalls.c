@@ -167,10 +167,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         printf(", \"%s\"", command[i]);
     printf(")...\n");
 
-    fflush(stdout);
 
     printf("Creating %s ...\n", outputfile);
-    fflush(stdout);
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, 0644);
     if (fd == -1) {
@@ -178,15 +176,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         return false;
     }
 
-    printf("Redirecting stdout to fd[%d] ...\n", fd);
-    fflush(stdout);
-    /* Redirect stdout to fd */
-    int redirect_status = dup2(fd, 1);
-    if (redirect_status < 0) {
-        printf("dup2() failed! Returning false ....\n");
-        return false;
-    }
-    close(fd);
+    
 
 
     fflush(stdout);
@@ -201,7 +191,20 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     }
 
     if (pid == 0) {
-        /* We are in child process. Let's execute the command */
+        /* We are in child process. */
+
+p       printf("In child processs - Redirecting stdout to fd[%d] ...\n", fd);
+        fflush(stdout);
+        /* Redirect stdout to fd */
+        int redirect_status = dup2(fd, 1);
+        close(fd);
+        if (redirect_status < 0) {
+            printf("dup2() failed! Returning false ....\n");
+            return false;
+        }
+
+        printf("Executing execv....\n");
+        fflush(stdout);
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
