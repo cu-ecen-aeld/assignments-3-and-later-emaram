@@ -136,7 +136,12 @@ bool do_exec(int count, ...)
 
     }
 
-    printf("do_exec(): Returning true ....\n");
+    printf("do_exec(): Start do_exec(%d", count);
+    for (i = 0; i < count; i++)
+        printf(", \"%s\"", command[i]);
+    printf(")... returns TRUE\n");
+
+
     fflush(stdout);
     return true;
 
