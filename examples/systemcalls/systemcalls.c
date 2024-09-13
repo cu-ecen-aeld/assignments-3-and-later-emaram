@@ -129,8 +129,8 @@ bool do_exec(int count, ...)
             return false;
         }
 
-        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_pid ", waiting_pid)
-        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_status ", waiting_status)
+        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_pid ", waiting_pid);
+        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_status ", waiting_status);
 
 
         /* If existed, check exit status */
