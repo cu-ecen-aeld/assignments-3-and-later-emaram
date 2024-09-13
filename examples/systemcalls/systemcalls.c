@@ -125,7 +125,7 @@ bool do_exec(int count, ...)
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
-            prt("do_exec", count, command, "waitpid() failed! Returning false ...");
+            LOG_M("do_exec", count, command, "waitpid() failed! Returning false ...");
             return false;
         }
 
@@ -138,7 +138,7 @@ bool do_exec(int count, ...)
             int child_exit_status = WEXITSTATUS(waiting_status);
             // printf("do_exec(): Child process exited with status %d ... \n", child_exit_status);
             // prt("do_exec", count, command, "WEXITSTATUS");
-            LOG_M1("do_exec", count, command, "Waiting pid done. Child xit Status ", child_exit_status)
+            LOG_M1("do_exec", count, command, "Waiting pid done. Child xit Status ", child_exit_status);
 
             if (child_exit_status != EXIT_SUCCESS) {
                 LOG_M("do_exec", count, command, "not EXIT_SUCCESS() failed! Returning false ...");
