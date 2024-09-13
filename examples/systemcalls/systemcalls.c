@@ -40,14 +40,28 @@ bool do_system(const char *cmd)
     return true;
 }
 
-void prt(char* function_name, int count, char** command, char* message)
+void LOG(char* function_name, int count, char** command)
 {
     printf("%s(%d", function_name, count);
     for (int i = 0; i < count; i++)
         printf(", \"%s\"", command[i]);
-    printf(") : %s\n", message);
+    printf(")");
     fflush(stdout);
 }
+
+void LOG_M(char* function_name, int count, char** command, char* message)
+{
+    LOG(function_name, count, command);
+    printf(" : %s\n", message);
+    fflush(stdout);
+}
+void LOG_M1(char* function_name, int count, char** command, char* message, int param)
+{
+    LOG(function_name, count, command);
+    printf(" : %s [%d]\n", message, param);
+    fflush(stdout);
+}
+
 
 /**
 * @param count -The numbers of variables passed to the function. The variables are command to execute.
@@ -89,14 +103,12 @@ bool do_exec(int count, ...)
 */
 
     va_end(args);
-    
-    
 
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
 
-        prt("do_exec", count, command, "fork() failed! Returning false ...");
+        LOG_M("do_exec", count, command, "fork() failed! Returning false ...");
         return false;
     }
 
@@ -105,7 +117,7 @@ bool do_exec(int count, ...)
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
-        prt("do_exec", count, command, "execv() failed! Returning false ...");
+        LOG_M("do_exec", count, command, "execv() failed! Returning false ...");
         return false;
     }
     else {
@@ -117,29 +129,30 @@ bool do_exec(int count, ...)
             return false;
         }
 
-        printf(".... waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
-        prt("do_exec", count, command, "Waiting pid done");
+        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_pid ", waiting_pid)
+        LOG_M1("do_exec", count, command, "Waiting pid done. Waiting_status ", waiting_status)
+
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
-            printf("do_exec(): Child process exited with status %d ... \n", child_exit_status);
-            prt("do_exec", count, command, "WEXITSTATUS");
+            // printf("do_exec(): Child process exited with status %d ... \n", child_exit_status);
+            // prt("do_exec", count, command, "WEXITSTATUS");
+            LOG_M1("do_exec", count, command, "Waiting pid done. Child xit Status ", child_exit_status)
 
             if (child_exit_status != EXIT_SUCCESS) {
-                prt("do_exec", count, command, "not EXIT_SUCCESS() failed! Returning false ...");
+                LOG_M("do_exec", count, command, "not EXIT_SUCCESS() failed! Returning false ...");
                 return false;
             }
         }
         else {
-            printf("do_exec(): The child seems to be killed, stopped or unexpected ... returning false\n");
-            prt("do_exec", count, command, "Child process killed or unexpected stop! Returning false ...");
+            LOG_M("do_exec", count, command, "Child process killed or unexpected stop! Returning false ...");
             return false;
         }
 
     }
 
-    prt("do_exec", count, command, "Returning TRUE ...");
+    LOG_M("do_exec", count, command, "Returning TRUE ...");
     return true;
 
 }
