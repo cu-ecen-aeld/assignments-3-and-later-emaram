@@ -203,15 +203,10 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
             return false;
         }
 
-        printf("Executing execv....\n");
         fflush(stdout);
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
-        printf("Seems that execv(...) failed.\n");
-        printf("Most probably there is not the full path of the command or an unknown command.\n");
-        printf(" Returning false ...\n");
-        /* Parent process return false */
         return false;
     }
     else {
