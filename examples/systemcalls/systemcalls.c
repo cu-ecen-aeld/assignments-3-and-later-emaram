@@ -119,10 +119,11 @@ bool do_exec(int count, ...)
 
         /* Since execv is blocker ... we should not reach this point*/
         LOG_M("do_exec", count, command, "execv() failed! Returning false ...");
+        exit(EXIT_FAILURE);
         return false;
     }
     else {
-        
+
             LOG_M1("do_exec", count, command, "Created pid ", pid);
         /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
@@ -229,6 +230,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
+        exit(EXIT_FAILURE);
         return false;
     }
     else {
