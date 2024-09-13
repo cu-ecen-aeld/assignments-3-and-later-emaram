@@ -193,7 +193,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     if (pid == 0) {
         /* We are in child process. */
 
-p       printf("In child processs - Redirecting stdout to fd[%d] ...\n", fd);
+        printf("In child processs - Redirecting stdout to fd[%d] ...\n", fd);
         fflush(stdout);
         /* Redirect stdout to fd */
         int redirect_status = dup2(fd, 1);
