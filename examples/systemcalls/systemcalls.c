@@ -91,11 +91,9 @@ bool do_exec(int count, ...)
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
-        printf("fork() failed!\n");
+        printf("fork() failed! Returning false ...\n");
         return false;
     }
-
-    fflush(stdout);
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
@@ -105,6 +103,7 @@ bool do_exec(int count, ...)
         /* Since execv is blocker ... we should not reach this point*/
         printf("Seems that execv(...) failed.\n");
         printf("Most probably there is not the full path of the command or an unknown command.\n");
+        printf(" Returning false ...\n");
         /* Parent process return false */
         return false;
     }
@@ -114,7 +113,7 @@ bool do_exec(int count, ...)
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
-            perror("waitpid() failed!");
+            printf("waitpid() failed! Returning false ...\n");
             return false;
         }
 
@@ -125,8 +124,10 @@ bool do_exec(int count, ...)
             int child_exit_status = WEXITSTATUS(waiting_status);
             printf("Child process exited with status %d ... \n", child_exit_status);
 
-            if (child_exit_status != EXIT_SUCCESS)
+            if (child_exit_status != EXIT_SUCCESS) {
+                printf(" Returning false ...\n");
                 return false;
+            }
         }
 
     }
@@ -134,7 +135,7 @@ bool do_exec(int count, ...)
     printf("Returning true ....\n");
     fflush(stdout);
     return true;
-    return true;
+
 }
 
 /**
@@ -167,6 +168,8 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 */
 
     va_end(args);
+
+    fflush(stdout);
 
     /* Create outputfile */
     int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
