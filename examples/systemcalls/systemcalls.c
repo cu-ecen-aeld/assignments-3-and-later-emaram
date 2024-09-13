@@ -81,12 +81,17 @@ bool do_exec(int count, ...)
 
     va_end(args);
     
+    printf("do_exec(): Start do_exec(%d", count);
+    for (i = 0; i < count; i++)
+        printf(", \"%s\"", command[i]);
+    printf(")...\n");
     fflush(stdout);
 
     /* Fork new child */
     pid_t pid = fork();
     if (pid == -1) {
         printf("do_exec(): fork() failed! Returning false ...\n");
+        fflush(stdout);
         return false;
     }
 
@@ -95,6 +100,8 @@ bool do_exec(int count, ...)
         execv(command[0], command);
 
         /* Since execv is blocker ... we should not reach this point*/
+        printf("do_exec(): execv() failed ... returning false\n");
+        fflush(stdout);
         return false;
     }
     else {
@@ -103,6 +110,7 @@ bool do_exec(int count, ...)
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
             printf("do_exec(): waitpid() failed! Returning false ...\n");
+            fflush(stdout);
             return false;
         }
 
@@ -112,8 +120,11 @@ bool do_exec(int count, ...)
         if (WIFEXITED(waiting_status)) {
             int child_exit_status = WEXITSTATUS(waiting_status);
             printf("do_exec(): Child process exited with status %d ... \n", child_exit_status);
+            fflush(stdout);
 
             if (child_exit_status != EXIT_SUCCESS) {
+                printf("do_exec(): . returning false\n");
+                fflush(stdout);
                 return false;
             }
         }
