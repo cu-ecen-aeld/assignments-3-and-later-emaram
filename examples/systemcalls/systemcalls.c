@@ -170,14 +170,16 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     fflush(stdout);
 
     printf("Creating %s ...\n", outputfile);
+    fflush(stdout);
     /* Create outputfile */
-    int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, S_IRWXU | S_IRWXG | S_IRWXO);
+    int fd = open(outputfile, O_RDWR | O_TRUNC | O_CREAT, 0644);
     if (fd == -1) {
         printf("Cannot create or open %s. Returning false ...\n", outputfile);
         return false;
     }
 
     printf("Redirecting stdout to fd[%d] ...\n", fd);
+    fflush(stdout);
     /* Redirect stdout to fd */
     int redirect_status = dup2(fd, 1);
     if (redirect_status < 0) {
