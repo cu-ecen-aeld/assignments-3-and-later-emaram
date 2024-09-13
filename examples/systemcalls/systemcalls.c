@@ -90,19 +90,16 @@ bool do_exec(int count, ...)
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
-        if (execv(command[0], command) == -1) {
-            /* Since execv is blocker ... we should not reach this point*/
-            printf("Seems that execv(%s, %s) failed.\n", command[0], command[1]);
-            printf("Most probably [%s] is not the full path of the command. I will not return false.\n", command[0]);
-            // for (int i = 0; i < count; i++ ) {
-            //     // Debugging part, to be removed
-            //     printf("Command[%d] is [%s]\n", i+1, command[i]);
-            // }
-            // return false;
-        }
+        execv(command[0], command);
+
+        /* Since execv is blocker ... we should not reach this point*/
+        printf("Seems that execv(...) failed.\n");
+        printf("Most probably there is not the full path of the command or an unknown command.\n");
+        /* Parent process return false */
+        return false;
     }
     else {
-        /* We are in parent process. Waiting for child to complete. */
+        /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
         if (waiting_pid == -1) {
@@ -115,8 +112,8 @@ bool do_exec(int count, ...)
             int child_exit_status = WEXITSTATUS(waiting_status);
             printf("Child process exited with status %d", child_exit_status);
 
-            //if (child_exit_status != 0)
-            //    return false;
+            if (child_exit_status != 0)
+                return false;
         }
 
     }
