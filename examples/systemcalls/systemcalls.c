@@ -104,6 +104,7 @@ bool do_exec(int count, ...)
         return false;
     }
     else {
+        printf("Waiting for pid %d...\n", pid);
         /* We are in parent process and pid is the ID of the child process. Waiting for child to complete. */
         int waiting_status = 0;
         pid_t waiting_pid = waitpid(pid, &waiting_status, 0);
@@ -111,6 +112,8 @@ bool do_exec(int count, ...)
             perror("waitpid() failed!");
             return false;
         }
+
+        printf("waiting_pid is %d and waiting_status is %d\n", waiting_pid, waiting_status);
 
         /* If existed, check exit status */
         if (WIFEXITED(waiting_status)) {
@@ -123,6 +126,7 @@ bool do_exec(int count, ...)
 
     }
 
+    printf("Returning true ....\n");
 
 
     return true;
