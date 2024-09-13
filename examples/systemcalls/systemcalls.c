@@ -111,6 +111,7 @@ bool do_exec(int count, ...)
         LOG_M("do_exec", count, command, "fork() failed! Returning false ...");
         return false;
     }
+    LOG_M1("do_exec", count, command, "Created pid ", pid);
 
     if (pid == 0) {
         /* We are in child process. Let's execute the command */
