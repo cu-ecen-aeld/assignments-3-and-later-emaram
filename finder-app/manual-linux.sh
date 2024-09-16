@@ -66,7 +66,7 @@ cp -r ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
 echo "Creating staging directory"
 cd "$OUTDIR"
 # Remove existing existing rootfs
-if [ -d "{OUTDIR}/rootfs" ] then
+if [ -d "${OUTDIR}/rootfs" ] then
     echo "Delete existing ${OUTDIR}/rootfs"
     sudo rm -rf ${OUTDIR}/rootfs
 fi
