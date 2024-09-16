@@ -71,7 +71,7 @@ if [ -d "${OUTDIR}/rootfs" ] then
     sudo rm -rf ${OUTDIR}/rootfs
 fi
 
-mkdir ${OUTDIR}/rootfs
+mkdir -p ${OUTDIR}/rootfs
 cd ${OUTDIR}/rootfs
 
 # Create kernel tree
