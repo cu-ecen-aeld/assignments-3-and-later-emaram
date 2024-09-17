@@ -112,7 +112,7 @@ sudo mknod -m 600 dev/console c 5 1
 # TODO: Clean and build the writer utility
 echo "Cleaning the building writer utility ..."
 cd ${FINDER_APP_DIR}
-make clean
+make CROSS_COMPILE=${CROSS_COMPILE} clean
 make CROSS_COMPILE=${CROSS_COMPILE}
 
 # TODO: Copy the finder related scripts and executables to the /home directory
@@ -133,11 +133,11 @@ cd ${OUTDIR}/rootfs
 sudo chown -R root:root *
 
 # TODO: Create initramfs.cpio.gz
-echo "Creating initramfs.cpio.gz ..."
+echo "Creating initramfs.cpio ..."
 cd ${OUTDIR}/rootfs
 find . | cpio -H newc -ov --owner root:root > ${OUTDIR}/initramfs.cpio
+echo "Creating initramfs.cpio.gz ..."
 cd ${OUTDIR}
-ll -la
 gzip -f initramfs.cpio
 
 echo "Done!"
