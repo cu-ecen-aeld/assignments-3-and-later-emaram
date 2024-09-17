@@ -89,8 +89,11 @@ echo "Building and installing busybox ..."
 make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE}
 make CONFIG_PREFIX=${OUTDIR}/rootfs ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} install
 
-echo "Library dependencies"
+echo "Preparing library dependencies ..."
+cd ${OUTDIR}/rootfs
+echo "   -> Program interpreter ..."
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "program interpreter"
+echo "   -> Shared library ..."
 ${CROSS_COMPILE}readelf -a bin/busybox | grep "Shared library"
 
 # TODO: Add library dependencies to rootfs
