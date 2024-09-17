@@ -24,44 +24,44 @@ fi
 
 mkdir -p ${OUTDIR}
 
-# cd "$OUTDIR"
-# if [ ! -d "${OUTDIR}/linux-stable" ]; then
-#     #Clone only if the repository does not exist.
-# 	echo "CLONING GIT LINUX STABLE VERSION ${KERNEL_VERSION} IN ${OUTDIR}"
-# 	git clone ${KERNEL_REPO} --depth 1 --single-branch --branch ${KERNEL_VERSION}
-# fi
-# if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
-#     cd linux-stable
-#     echo "Checking out version ${KERNEL_VERSION}"
-#     git checkout ${KERNEL_VERSION}
+cd "$OUTDIR"
+if [ ! -d "${OUTDIR}/linux-stable" ]; then
+    #Clone only if the repository does not exist.
+	echo "CLONING GIT LINUX STABLE VERSION ${KERNEL_VERSION} IN ${OUTDIR}"
+	git clone ${KERNEL_REPO} --depth 1 --single-branch --branch ${KERNEL_VERSION}
+fi
+if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
+    cd linux-stable
+    echo "Checking out version ${KERNEL_VERSION}"
+    git checkout ${KERNEL_VERSION}
 
-#     # TODO: Add your kernel build steps here
-#     # Remove all generated files, including config and backups
-#     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} mrproper
+    # TODO: Add your kernel build steps here
+    # Remove all generated files, including config and backups
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} mrproper
 
-#     # Architecture kernel .config file
-#     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} defconfig
+    # Architecture kernel .config file
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} defconfig
 
-#     # Build kernel image to boot with QEMU
-#     make -j4 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} all
+    # Build kernel image to boot with QEMU
+    make -j4 ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} all
 
-#     # Build kernel device tree
-#     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} dtbs
-# fi
+    # Build kernel device tree
+    make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} dtbs
+fi
 
-# echo "Adding the Image in outdir"
+echo "Adding the Image in outdir"
 
-# echo "Creating the staging directory for the root filesystem"
-# cd "$OUTDIR"
-# if [ -d "${OUTDIR}/rootfs" ]
-# then
-# 	echo "Deleting rootfs directory at ${OUTDIR}/rootfs and starting over"
-#     sudo rm  -rf ${OUTDIR}/rootfs
-# fi
+echo "Creating the staging directory for the root filesystem"
+cd "$OUTDIR"
+if [ -d "${OUTDIR}/rootfs" ]
+then
+	echo "Deleting rootfs directory at ${OUTDIR}/rootfs and starting over"
+    sudo rm  -rf ${OUTDIR}/rootfs
+fi
 
-# # TODO: Create necessary base directories
-# echo "Adding the image in ${OUTDIR}"
-# cp -r ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
+# TODO: Create necessary base directories
+echo "Adding the image in ${OUTDIR}"
+cp -r ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ${OUTDIR}
 
 echo "Creating staging directory"
 cd "$OUTDIR"
